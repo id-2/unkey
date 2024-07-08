@@ -1,6 +1,6 @@
 import { authors } from "@/content/blog/authors";
 import { cn } from "@/lib/utils";
-import type { Post } from "contentlayer/generated";
+import type { Post } from "content-collections";
 import Link from "next/link";
 import { BlogCard } from "./blog-card";
 import { BlogPagination } from "./blog-pagination";
@@ -73,7 +73,7 @@ export const BlogGrid: React.FC<Props> = ({ className, posts, searchParams }) =>
         )}
       >
         {visiblePosts.map((post) => (
-          <Link href={`${post._raw.flattenedPath}`} key={post._raw.flattenedPath}>
+          <Link href={`/blog/${post._meta.path}`} key={post._meta.path}>
             <BlogCard
               tags={post.tags}
               imageUrl={post.image ?? "/images/blog-images/defaultBlog.png"}

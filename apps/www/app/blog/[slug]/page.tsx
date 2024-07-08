@@ -1,30 +1,29 @@
 import { SuggestedBlogs } from "@/components/blog/suggested-blogs";
 import { CTA } from "@/components/cta";
-import { MDX } from "@/components/mdx-content";
+import { MdxComponents } from "@/components/mdx-content";
 import { TopLeftShiningLight, TopRightShiningLight } from "@/components/svg/background-shiny";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MeteorLinesAngular } from "@/components/ui/meteorLines";
 import { authors } from "@/content/blog/authors";
 import { cn } from "@/lib/utils";
+import { MDXContent } from "@content-collections/mdx/react";
+import { allPosts } from "content-collections";
 import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { type Post, allPosts } from ".contentlayer/generated";
-
-interface Heading {
-  level: number | undefined;
-  text: string;
-  slug: string;
-}
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({
-    slug: post._raw.flattenedPath.replace("blog/", ""),
+    slug: post._meta.path,
   }));
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const post = allPosts.find((post) => post._raw.flattenedPath === `blog/${params.slug}`);
+export function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Metadata {
+  const post = allPosts.find((post) => post._meta.path === `${params.slug}`);
   if (!post) {
     notFound();
   }
@@ -34,7 +33,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
     openGraph: {
       title: `${post.title} | Unkey`,
       description: post.description,
-      url: `https://unkey.com/${post._raw.flattenedPath}`,
+      url: `https://unkey.com/${post._meta.filePath}`,
       siteName: "unkey.com",
       type: "article",
       images: {
@@ -66,7 +65,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 }
 
 const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
-  const post = allPosts.find((post) => post._raw.flattenedPath === `blog/${params.slug}`) as Post;
+  const post = allPosts.find((post) => post._meta.path === `${params.slug}`);
   if (!post) {
     notFound();
   }
@@ -196,7 +195,7 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
               </div>
             </div>
             <div className="mt-12 prose-sm lg:pr-24 md:prose-md text-white/60 sm:mx-6 prose-strong:text-white/90 prose-code:text-white/80 prose-code:bg-white/10 prose-code:px-2 prose-code:py-1 prose-code:border-white/20 prose-code:rounded-md prose-pre:p-0 prose-pre:m-0 prose-pre:leading-6">
-              <MDX code={post.body.code} />
+              <MDXContent code={post.mdx} />
             </div>
           </div>
 
@@ -226,11 +225,11 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
                 {format(parseISO(post.date), "MMM dd, yyyy")}
               </time>
             </div>
-            {post.tableOfContents.length !== 0 ? (
+            {post.headings?.length !== 0 ? (
               <div className="flex flex-col gap-4 not-prose lg:gap-2">
                 <p className="text-sm prose text-nowrap text-white/50">Contents</p>
                 <ul className="relative flex flex-col gap-1 overflow-hidden">
-                  {post.tableOfContents.map((heading: Heading) => {
+                  {post.headings?.map((heading) => {
                     return (
                       <li key={`#${heading.slug}`}>
                         <Link
@@ -254,7 +253,7 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
             <div className="flex flex-col mt-4">
               <p className="pt-10 text-md text-white/50">Suggested</p>
               <div>
-                <SuggestedBlogs currentPostSlug={post.url} />
+                <SuggestedBlogs currentPostSlug={post._meta.path} />
               </div>
             </div>
           </div>

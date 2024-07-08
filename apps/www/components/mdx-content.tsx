@@ -1,4 +1,4 @@
-import { useMDXComponent } from "next-contentlayer/hooks";
+import Image from "next/image";
 import { BlogCodeBlock, BlogCodeBlockSingle } from "./blog/blog-code-block";
 import { BlogImage } from "./blog/blog-image";
 import { BlogList, BlogListItem, BlogListNumbered } from "./blog/blog-list";
@@ -61,19 +61,3 @@ export const MdxComponents = {
   pre: BlogCodeBlockSingle,
   BlogCodeBlock,
 };
-
-interface MDXProps {
-  code: string;
-}
-
-export function MDX({ code }: MDXProps) {
-  const Component = useMDXComponent(code);
-
-  return (
-    <Component
-      components={{
-        ...MdxComponents,
-      }}
-    />
-  );
-}
